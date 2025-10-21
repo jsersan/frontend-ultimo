@@ -1,9 +1,10 @@
-<!-- Archivo original: app/components/product/search-results/search-results.component.html -->
 <div class="search-results-container">
   <!-- Título de la página que muestra el término buscado -->
-  <h1 id="titulo">
-    Resultados de la búsqueda "{{ searchTerm }}"
-  </h1>
+  <div class="category-header">
+    <h1 id="titulo">
+      Resultados para "{{ searchTerm }}"
+    </h1>
+  </div>
   
   <!-- Indicador de carga mientras se buscan productos -->
   <div *ngIf="loading" class="loading-indicator">
@@ -13,25 +14,35 @@
   
   <!-- Mensaje cuando no hay resultados -->
   <div *ngIf="!loading && products.length === 0" class="no-results">
-    <p>No se encontraron productos que coincidan con "{{ searchTerm }}".</p>
-    <p>Intenta con otros términos de búsqueda.</p>
+    <p>No se encontraron productos que coincidan con "<strong>{{ searchTerm }}</strong>".</p>
+    <p>Intenta con otros términos de búsqueda como:</p>
+    <ul>
+      <li>anillo, banana, labret, barbell</li>
+      <li>plug, túnel, expander</li>
+      <li>piercing, dilatación</li>
+    </ul>
   </div>
   
-  <!-- Contenedor de resultados (solo visible si hay productos) -->
+  <!-- ✅ CONTENEDOR DE RESULTADOS usando la misma estructura que otros componentes -->
   <div id="articulos" *ngIf="!loading && products.length > 0">
-    <!-- Iteración sobre los productos encontrados -->
-    <div class="articulo" *ngFor="let product of products" [routerLink]="['/product', product.id]">
-      <!-- Imagen del producto -->
-      <img [src]="'assets/images/' + product.carpetaimg + '/' + product.imagen" [alt]="product.nombre" />
+    <!-- ✅ USAR la misma estructura que home.component y product-list.component -->
+    <div class="articulo" 
+         *ngFor="let product of products" 
+         (click)="openProductPopup(product, $event)">
       
-      <!-- Nombre del producto -->
+      <!-- ✅ Imagen del producto usando el servicio centralizado -->
+      <img [src]="productService.getProductImageSrc(product)" 
+           [alt]="product.nombre" 
+           (error)="handleImageError($event)" />
+      
+      <!-- ✅ Detalles del producto -->
       <h2>{{ product.nombre }}</h2>
-      
-      <!-- Precio formateado como moneda -->
       <h3>{{ formatPrice(product.precio) }}</h3>
-      
-      <!-- Descripción del producto -->
-      <p>{{ product.descripcion }}</p>
+      <p class="description">{{ product.descripcion }}</p>
     </div>
   </div>
 </div>
+
+<!-- ✅ IMPORTANTE: Incluir el componente popup de producto -->
+<app-product-popup></app-product-popup>
+

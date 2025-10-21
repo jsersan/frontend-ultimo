@@ -1,77 +1,109 @@
-<!-- historial-pedidos.component.html - ARCHIVO COMPLETO -->
-
 <div class="historial-container">
-    <!-- Título principal -->
-    <h1 class="historial-title">historial de pedidos</h1>
-    
-    <!-- Loading state -->
-    <div class="loading-pedidos" *ngIf="loading">
-      <div class="spinner"></div>
-      <p>Cargando pedidos...</p>
-    </div>
-    
-    <!-- No hay pedidos -->
-    <div class="no-pedidos" *ngIf="!loading && (!pedidos || pedidos.length === 0)">
-      <div class="no-pedidos-icon">📦</div>
-      <h3>No tienes pedidos aún</h3>
-      <p>Cuando realices tu primera compra, aparecerá aquí tu historial de pedidos.</p>
-    </div>
-    
-    <!-- Lista de pedidos -->
-    <div class="pedidos-list" *ngIf="!loading && pedidos && pedidos.length > 0">
-      <!-- Cada pedido individual -->
-      <div class="pedido-item" *ngFor="let pedido of pedidos; let i = index">
-        
-        <!-- Cabecera del pedido (clickeable) -->
-        <div class="pedido-header" (click)="togglePedido(i)">
-          <div class="pedido-info">
-            <span class="pedido-ref">ref.: #{{ pedido.id }}</span>
-            <span class="pedido-fecha">{{ formatearFecha(pedido.fecha!) }}</span>
-          </div>
-          <div class="pedido-total">{{ pedido.total | currency:'EUR':'symbol':'1.2-2' }}</div>
-          <div class="expand-icon" [class.expanded]="pedido.expanded">
-            <span>▼</span>
-          </div>
+  <!-- Título principal -->
+  <h1 class="historial-title">historial de pedidos</h1>
+  
+  <!-- Loading state -->
+  <div class="loading-pedidos" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando pedidos...</p>
+  </div>
+  
+  <!-- Error state -->
+  <div class="no-pedidos" *ngIf="error && !loading">
+    <div class="no-pedidos-icon">⚠️</div>
+    <h3>Error</h3>
+    <p>{{ error }}</p>
+    <button (click)="recargarPedidos()" class="reload-btn" style="margin-top: 20px;">
+      🔄 Reintentar
+    </button>
+  </div>
+  
+  <!-- No hay pedidos -->
+  <div class="no-pedidos" *ngIf="!loading && !error && (!pedidos || pedidos.length === 0)">
+    <div class="no-pedidos-icon">📦</div>
+    <h3>No tienes pedidos aún</h3>
+    <p>Cuando realices tu primera compra, aparecerá aquí tu historial de pedidos.</p>
+  </div>
+  
+  <!-- Lista de pedidos -->
+  <div class="pedidos-list" *ngIf="!loading && pedidos && pedidos.length > 0">
+    <!-- Cada pedido individual -->
+    <div class="pedido-item" *ngFor="let pedido of pedidos; let i = index">
+      
+      <!-- Cabecera del pedido (clickeable) -->
+      <div class="pedido-header" (click)="togglePedido(i)">
+        <div class="pedido-info">
+          <span class="pedido-ref">ref.: #{{ pedido.id }}</span>
+          <span class="pedido-fecha">{{ formatearFecha(pedido.fecha) }}</span>
         </div>
-        
-        <!-- Contenido expandible -->
-        <div class="pedido-content" [class.expanded]="pedido.expanded">
-          <div class="pedido-details">
-            <table class="pedido-table">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Color</th>
-                  <th>Cantidad</th>
-                  <th>Precio</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Productos del pedido -->
-                <tr *ngFor="let linea of getLineasPedido(pedido.id!)">
-                  <td [attr.data-label]="'Producto'">{{ linea.nombre }}</td>
-                  <td [attr.data-label]="'Color'">{{ linea.color }}</td>
-                  <td [attr.data-label]="'Cantidad'">{{ linea.cantidad }}</td>
-                  <td [attr.data-label]="'Precio'">{{ calcularPrecioLinea(linea) | currency:'EUR':'symbol':'1.2-2' }}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="precio-total-row">
-                  <td colspan="3"><strong>Precio total:</strong></td>
-                  <td><strong>{{ pedido.total | currency:'EUR':'symbol':'1.2-2' }}</strong></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+        <div class="pedido-total">{{ pedido.total | currency:'EUR':'symbol':'1.2-2' }}</div>
+        <div class="expand-icon" [class.expanded]="pedido.expanded">
+          <span>▼</span>
         </div>
-        
       </div>
-    </div>
-    
-    <!-- Botón para recargar (opcional) -->
-    <div class="reload-section" *ngIf="!loading && pedidos && pedidos.length > 0">
-      <button class="reload-btn" (click)="recargarPedidos()">
-        🔄 Actualizar pedidos
-      </button>
+      
+      <!-- Contenido expandible -->
+      <div class="pedido-content" [class.expanded]="pedido.expanded">
+        <div class="pedido-details">
+          
+          <!-- Botones de acciones -->
+          <div class="pedido-actions">
+            <button class="action-btn pdf-btn" (click)="descargarAlbaran(pedido.id!)">
+              <span class="pdf-icon">🖨️</span>
+              <span class="pdf-text">PDF</span>
+            </button>
+          </div>
+
+          <!-- Tabla de productos -->
+          <table class="pedido-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Color</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Productos del pedido -->
+              <tr *ngFor="let linea of getLineasPedido(pedido.id!)">
+                <td [attr.data-label]="'Producto'">
+                  {{ linea.nombre || linea.product?.nombre || 'Sin nombre' }}
+                </td>
+                <td [attr.data-label]="'Color'">
+                  {{ linea.color }}
+                </td>
+                <td [attr.data-label]="'Cantidad'">
+                  <!-- ✅ CORREGIDO: Usar 'cantidad' (frontend) no 'cant' (backend) -->
+                  {{ linea.cantidad || linea.cant || 1 }}
+                </td>
+                <td [attr.data-label]="'Precio Unitario'">
+                  {{ (linea.precio || linea.product?.precio || 0) | currency:'EUR':'symbol':'1.2-2' }}
+                </td>
+                <td [attr.data-label]="'Subtotal'">
+                  <!-- ✅ CORREGIDO: Usar calcularPrecioLinea que ahora calcula bien -->
+                  {{ calcularPrecioLinea(linea) | currency:'EUR':'symbol':'1.2-2' }}
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="precio-total-row">
+                <td colspan="4"><strong>Precio total:</strong></td>
+                <td><strong>{{ pedido.total | currency:'EUR':'symbol':'1.2-2' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      
     </div>
   </div>
+  
+  <!-- Botón para recargar (opcional) -->
+  <div class="reload-section" *ngIf="!loading && pedidos && pedidos.length > 0">
+    <button class="reload-btn" (click)="recargarPedidos()">
+      🔄 Actualizar pedidos
+    </button>
+  </div>
+</div>

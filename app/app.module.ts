@@ -32,6 +32,7 @@ import { ImageUrlPipe } from './pipes/image-url.pipe';
 import { LoginPopupComponent } from './components/login-popup/login-popup.component';
 import { RegistroPopupComponent } from './components/registro-popup/registro-popup.component';
 import { HistorialPedidosComponent } from './components/historial-pedidos/historial-pedidos.component';
+import { PdfService } from './services/pdf.service';
 
 @NgModule({
   declarations: [
@@ -68,7 +69,8 @@ import { HistorialPedidosComponent } from './components/historial-pedidos/histor
   ],
   providers: [
     // Añadir el interceptor de errores a los proveedores
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    [PdfService]
   ],
   bootstrap: [AppComponent]
 })

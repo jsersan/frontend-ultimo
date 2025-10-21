@@ -27,6 +27,8 @@ export interface OrderLine {
   color: string;
   cantidad: number; // ✅ Frontend usa 'cantidad'
   nombre?: string;
+  precio?: number; // ✅ AÑADIDO: Precio unitario
+  product?: any; // ✅ AÑADIDO: Objeto producto completo
 }
 
 /**
@@ -40,6 +42,8 @@ export interface OrderLineBackend {
   color: string;
   cant: number; // ✅ Backend espera 'cant'
   nombre?: string;
+  precio?: number; // ✅ AÑADIDO: Precio unitario
+  product?: any; // ✅ AÑADIDO: Objeto producto completo
 }
 
 /**
@@ -129,28 +133,41 @@ export class OrderUtils {
         idprod: line.idprod,
         color: line.color,
         cant: line.cantidad, // cantidad -> cant
-        nombre: line.nombre
+        nombre: line.nombre,
+        precio: line.precio, // ✅ PRESERVAR: Precio unitario
+        product: line.product // ✅ PRESERVAR: Objeto producto
       }))
     };
   }
 
   /**
-   * Convierte OrderBackend a Order (frontend)
+   * ✅ CORREGIDO: Convierte OrderBackend a Order (frontend)
+   * Ahora preserva el precio y el objeto product
    */
   static fromBackendFormat(orderBackend: OrderBackend): Order {
+    console.log('📦 Transformando OrderBackend a Order:', orderBackend);
+    
     return {
       id: orderBackend.id,
       usuario_id: orderBackend.iduser,
       fecha: orderBackend.fecha,
       total: orderBackend.total,
-      lineas: orderBackend.lineas?.map(line => ({
-        id: line.id,
-        idpedido: line.idpedido,
-        idprod: line.idprod,
-        color: line.color,
-        cantidad: line.cant, // cant -> cantidad
-        nombre: line.nombre
-      }))
+      lineas: orderBackend.lineas?.map(line => {
+        const transformedLine = {
+          id: line.id,
+          idpedido: line.idpedido,
+          idprod: line.idprod,
+          color: line.color,
+          cantidad: line.cant, // cant -> cantidad
+          nombre: line.nombre,
+          precio: line.precio || 0, // ✅ IMPORTANTE: Mapear precio
+          product: line.product // ✅ IMPORTANTE: Incluir objeto product
+        };
+        
+        console.log(`📋 Línea transformada: ${transformedLine.nombre} - Precio: ${transformedLine.precio}`);
+        
+        return transformedLine;
+      })
     };
   }
 
@@ -163,7 +180,9 @@ export class OrderUtils {
       idprod: item.id,
       color: item.color || 'Estándar',
       cantidad: item.cantidad,
-      nombre: item.nombre || ''
+      nombre: item.nombre || '',
+      precio: item.precio, // ✅ AÑADIDO: Incluir precio del carrito
+      product: item.producto // ✅ AÑADIDO: Incluir producto
     }));
   }
 

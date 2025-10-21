@@ -261,7 +261,7 @@ export class CartService {
     this.saveCart(this.getCartItems());
     
     // Abrir el carrito automáticamente al añadir producto
-    this.openCart();
+    // this.openCart();
   }
 
   // Actualizar cantidad de un item

@@ -22,50 +22,116 @@ export class ProductService {
   private selectedProductSubject = new BehaviorSubject<Product | null>(null)
   selectedProduct$ = this.selectedProductSubject.asObservable()
 
-  // Mapeo de productos a imágenes
-  readonly PRODUCT_IMAGE_MAP: { [key: string]: string } = {
-    // Bananas
-    'banana para el ombligo negra': 'assets/images/banana-simple/banana-negra.jpg',
-    'banana para el ombligo dorada': 'assets/images/banana-simple/banana-simple1.jpg',
-    'banana con rosa': 'assets/images/banana-flor/default.jpg',
-    'banana simple': 'assets/images/banana-simple/default.jpg',
-
-    // Labrets
-    'labret triángulo': 'assets/images/labret-triangulos/default.jpg',
-    'labret corazón': 'assets/images/labret-corazon/default.jpg',
-    'labret simple': 'assets/images/labret/default.jpg',
-
-    // Barbells
-    'barbell flecha': 'assets/images/barbell-flecha/default.jpg',
-    'barbell con alas': 'assets/images/barbell-alas/default.jpg',
-    'barbell largo': 'assets/images/barbell-largo/default.jpg',
-
-    // Circular Barbells
-    'circular barbell con piedra':
-      'assets/images/circular-barbel-piedra/default.jpg',
-    'circular barbell con bola cóni':
-      'assets/images/circular-barbel/default.jpg',
-
-    // Anillos
-    'segment ring': 'assets/images/anillo/default.jpg',
-    'anillo con bisagra': 'assets/images/anillo/default.jpg',
-    'anillo con corazón': 'assets/images/anillo-corazon/default.jpg',
-    'aro para nostril': 'assets/images/aro-nostril/default.jpg',
-
-    // Túneles y Plugs
-    túnel: 'assets/images/tuneles/default.jpg',
-    'túnel de silicona': 'assets/images/tunel/tunel1.jpg',
-    'túnel mandala': 'assets/images/tuneles/tuneles-orfebre1.jpg',
-    'túnel de acero': 'assets/images/tuneles-metal/tunel-metal2.jpg',
-    plug: 'assets/images/plug/default.jpg',
-     'plug de silicona': 'assets/images/plug-dobles/plug-doble3.jpg',
-
-    // Expanders
-    'set de dilatadores': 'assets/images/set-dilatadores/default.jpg',
-    'expander espiral': 'assets/images/expander/default.jpg',
-    'set de expanders': 'assets/images/set-dilatadores/default.jpg',
-    'set de expanders curvados': 'assets/images/set-dilatadores/default.jpg'
-  }
+  // ✅ MAPEO ACTUALIZADO BASADO EN LA ESTRUCTURA REAL DE ASSETS
+  private readonly PRODUCT_COLORS_MAP: { [key: string]: string[] } = {
+    // ========== ANILLOS (dentro de piercing/) ==========
+    'anillo con corazón': ['dorado', 'negro', 'plateado'],
+    'anillo corazón': ['dorado', 'negro', 'plateado'], 
+    'anillo con corazon': ['dorado', 'negro', 'plateado'],
+    'anillo corazon': ['dorado', 'negro', 'plateado'],
+    
+    'anillo fino': ['azul', 'cobre', 'dorado', 'negro', 'multicolor'],
+    'anillo con bisagra': ['azul', 'cobre', 'dorado', 'negro', 'multicolor'],
+    'anillo bisagra': ['azul', 'cobre', 'dorado', 'negro', 'multicolor'],
+    
+    'aro para nostril': ['azul', 'multicolor', 'negro'],
+    'aro nostril': ['azul', 'multicolor', 'negro'],
+    
+    'segment ring': ['azul', 'dorado', 'multicolor', 'rosa'],
+    
+    // ========== BANANAS (dentro de piercing/) ==========
+    'banana con rosa': ['azul', 'celeste', 'rojo', 'rosa', 'verde'],
+    'banana flor': ['azul', 'celeste', 'rojo', 'rosa', 'verde'],
+    'banana con flor': ['azul', 'celeste', 'rojo', 'rosa', 'verde'],
+    
+    'banana con gema': ['azul', 'morado', 'transparente', 'rojo', 'verde', 'trebol'],
+    'banana gema': ['azul', 'morado', 'transparente', 'rojo', 'verde', 'trebol'],
+    
+    'banana simple': ['dorado', 'plateado', 'multicolor'],
+    'banana para el ombligo': ['dorado', 'plateado', 'multicolor'],
+    'banana para ombligo': ['dorado', 'plateado', 'multicolor'],
+    
+    // ========== BARBELLS (dentro de piercing/) ==========
+    'barbell con alas': ['plateado'],
+    'barbells alas': ['plateado'],
+    'barbell alas': ['plateado'],
+    
+    'barbell flecha': ['dorado', 'negro', 'plateado'],
+    'barbells flecha': ['dorado', 'negro', 'plateado'],
+    'barbell con flecha': ['dorado', 'negro', 'plateado'],
+    
+    'barbell largo': ['azul', 'cobre', 'dorado', 'mulicolor'],
+    'barbells largo': ['azul', 'cobre', 'dorado', 'mulicolor'],
+    
+    // ========== CIRCULAR BARBELLS (dentro de piercing/) ==========
+    'circular barbell con flecha': ['dorado', 'cobrejpg', 'negro'],
+    'circular barbell flecha': ['dorado', 'cobrejpg', 'negro'],
+    
+    'circular barbell con piedra': ['cristal', 'negro'],
+    'circular barbell piedra': ['cristal', 'negro'],
+    
+    // ========== LABRETS (dentro de piercing/) ==========
+    'labret corazón': ['dorado', 'negro', 'plateado', 'rosa'],
+    'labret con corazón': ['dorado', 'negro', 'plateado', 'rosa'],
+    'labret corazon': ['dorado', 'negro', 'plateado', 'rosa'],
+    
+    'labret simple': ['cobre', 'dorado', 'negro', 'multicolor'],
+    
+    'labret triángulo': ['dorado', 'negro', 'plateado', 'rosa'],
+    'labret triangulo': ['dorado', 'negro', 'plateado', 'rosa'],
+    'labret con triángulo': ['dorado', 'negro', 'plateado', 'rosa'],
+    'labret triangulos': ['dorado', 'negro', 'plateado', 'rosa'],
+    
+    // ========== PLUGS ==========
+    'plug simple': ['amarillo', 'azul', 'morado', 'negro', 'blanco', 'verde'],
+    'plug': ['amarillo', 'azul', 'morado', 'negro', 'blanco', 'verde'],
+    
+    'plug doble': ['amarillo', 'azul', 'beige', 'caoba', 'morado', 'rojo', 'verde'],
+    'plug dobles': ['amarillo', 'azul', 'beige', 'caoba', 'morado', 'rojo', 'verde'],
+    'plug de silicona': ['amarillo', 'azul', 'beige', 'caoba', 'morado', 'rojo', 'verde'],
+    'plug silicona': ['amarillo', 'azul', 'beige', 'caoba', 'morado', 'rojo', 'verde'],
+    
+    // ========== DILATADORES Y EXPANDERS ==========
+    'set de dilatadores': ['blanco', 'rosa', 'plateado', 'violeta'],
+    'dilatadores': ['negro', 'rojo'],
+    'dilatador': ['negro', 'rojo'],
+    
+    'expander duo': ['celeste', 'dorado', 'verde'],
+    'expander con duo': ['celeste', 'dorado', 'verde'],
+    
+    'expander medusa': ['negro', 'verde'],
+    'expander con medusa': ['negro', 'verde'],
+    
+    // ========== TÚNELES (organizados por material) ==========
+    'túnel de acrílico': ['azul', 'blanco', 'rojo', 'negro', 'amarillo'],
+    'tunel de acrílico': ['azul', 'blanco', 'rojo', 'negro', 'amarillo'],
+    'túnel acrílico': ['azul', 'blanco', 'rojo', 'negro', 'amarillo'],
+    'tunel acrilico': ['azul', 'blanco', 'rojo', 'negro', 'amarillo'],
+    
+    'túnel de metal': ['azul', 'cobre', 'dorado'],
+    'tunel de metal': ['azul', 'cobre', 'dorado'],
+    'túnel metal': ['azul', 'cobre', 'dorado'],
+    'tunel metal': ['azul', 'cobre', 'dorado'],
+    
+    'túnel orfebre': ['dorado', 'plateado'],
+    'tunel orfebre': ['dorado', 'plateado'],
+    'túnel mandala': ['dorado', 'plateado'],
+    'tunel mandala': ['dorado', 'plateado'],
+    
+    'túnel de silicona': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    'tunel de silicona': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    'túnel silicona': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    'tunel silicona': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    
+    // ========== GENÉRICOS ==========
+    'túnel simple': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    'tunel simple': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    'túnel': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    'tunel': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+    
+    // ========== PIERCINGS GENERALES ==========
+    'piercing': ['azul', 'cobre', 'dorado', 'negro', 'multicolor']
+  };
 
   // Imagen por defecto
   defaultImage = 'assets/images/default.jpg'
@@ -74,10 +140,7 @@ export class ProductService {
 
   // Método para obtener todos los productos
   getProducts (): Observable<Product[]> {
-    // Añadir log para depuración
-    // console.log('Solicitando productos desde:', this.apiUrl)
     return this.http.get<Product[]>(this.apiUrl).pipe(
-      // Añadimos manejo de errores para ser más robustos
       catchError(error => {
         console.error('Error al obtener productos:', error)
         return of([])
@@ -88,7 +151,6 @@ export class ProductService {
   // Método para obtener un producto específico
   getProduct (id: number): Observable<Product> {
     const url = `${this.apiUrl}/${id}`
-    // console.log('Solicitando producto con ID:', id, 'desde:', url)
     return this.http.get<Product>(url).pipe(
       catchError(error => {
         console.error(`Error al obtener producto ${id}:`, error)
@@ -97,9 +159,8 @@ export class ProductService {
     )
   }
 
-  // Método para obtener productos por categoría
+  // Método pour obtener productos por categoría
   getProductsByCategory (categoryId: number): Observable<Product[]> {
-    // Corregido: Ruta adecuada para filtrar por categoría
     const url = `${this.apiUrl}/categoria/${categoryId}`
     console.log(
       'Solicitando productos por categoría:',
@@ -109,7 +170,6 @@ export class ProductService {
     )
     return this.http.get<Product[]>(url).pipe(
       catchError(error => {
-        // console.error(`Error al obtener productos de categoría ${categoryId}:`, error)
         return of([])
       })
     )
@@ -121,9 +181,199 @@ export class ProductService {
     return this.http.get<Category>(url)
   }
 
+  // ✅ MÉTODO MEJORADO PARA OBTENER COLORES ESPECÍFICOS DEL PRODUCTO
+  getProductColors(productId: number): Observable<string[]> {
+    console.log('🎨 Obteniendo colores para producto ID:', productId);
+    
+    // Primero obtenemos el producto para conocer su nombre
+    return this.getProduct(productId).pipe(
+      map(product => {
+        if (!product || !product.nombre) {
+          console.warn('⚠️ Producto no encontrado o sin nombre');
+          return ['Estándar'];
+        }
+        
+        const productName = product.nombre.toLowerCase().trim();
+        console.log('🔍 Buscando colores para:', productName);
+        
+        // Usar ProductImageHelper para obtener colores consistentes
+        const availableColors = ProductImageHelper.getAvailableColors(productName);
+        
+        console.log('✅ Colores disponibles:', availableColors);
+        return availableColors.length > 0 ? availableColors : ['Estándar'];
+      }),
+      catchError(error => {
+        console.error('❌ Error obteniendo colores del producto:', error);
+        return of(['Estándar']);
+      })
+    );
+  }
+
+  // ✅ MÉTODO ALTERNATIVO PARA OBTENER COLORES (usando mapeo local como fallback)
+  private getAvailableColorsForProduct(productName: string): string[] {
+    // Normalizar el nombre del producto
+    const normalizedName = productName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Quitar tildes
+      .trim();
+    
+    console.log('🔍 Nombre normalizado:', normalizedName);
+    
+    // PASO 1: Buscar coincidencias exactas primero
+    for (const [key, colors] of Object.entries(this.PRODUCT_COLORS_MAP)) {
+      const normalizedKey = key
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+      
+      if (normalizedName === normalizedKey) {
+        console.log(`🎯 Coincidencia exacta: "${key}" -> [${colors.join(', ')}]`);
+        return colors;
+      }
+    }
+    
+    // PASO 2: Estrategia de coincidencias parciales flexibles
+    const bestMatch = this.findBestPartialMatch(normalizedName);
+    if (bestMatch.length > 0) {
+      return bestMatch;
+    }
+    
+    // PASO 3: Buscar por palabras clave específicas
+    const keywordMatch = this.findByKeywords(normalizedName);
+    if (keywordMatch.length > 0) {
+      return keywordMatch;
+    }
+    
+    // PASO 4: Buscar por tipo de producto
+    const typeMatch = this.findByProductType(normalizedName);
+    if (typeMatch.length > 0) {
+      return typeMatch;
+    }
+    
+    // Si no hay coincidencias específicas, devolver colores por defecto
+    console.log('⚠️ No se encontraron colores específicos, usando por defecto');
+    return ['Estándar'];
+  }
+
+  // ✅ ESTRATEGIA 3: Coincidencias parciales flexibles mejoradas
+  private findBestPartialMatch(productName: string): string[] {
+    let bestMatch: { key: string, colors: string[], score: number } = { key: '', colors: [], score: 0 };
+    
+    for (const [key, colors] of Object.entries(this.PRODUCT_COLORS_MAP)) {
+      const normalizedKey = key
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+      
+      // Calcular puntuación de similitud
+      const score = this.calculateSimilarityScore(productName, normalizedKey);
+      
+      if (score > bestMatch.score && score > 0.6) { // Umbral de similitud
+        bestMatch = { key, colors, score };
+      }
+    }
+    
+    if (bestMatch.score > 0.6) {
+      console.log(`🎯 Mejor coincidencia parcial: "${bestMatch.key}" (score: ${bestMatch.score.toFixed(2)}) -> [${bestMatch.colors.join(', ')}]`);
+      return bestMatch.colors;
+    }
+    
+    return [];
+  }
+
+  // ✅ Calcular puntuación de similitud entre dos strings
+  private calculateSimilarityScore(str1: string, str2: string): number {
+    const words1 = str1.split(' ').filter(w => w.length > 2); // Solo palabras de más de 2 caracteres
+    const words2 = str2.split(' ').filter(w => w.length > 2);
+    
+    if (words1.length === 0 || words2.length === 0) return 0;
+    
+    let matchCount = 0;
+    let totalWords = Math.max(words1.length, words2.length);
+    
+    // Contar palabras que coinciden exactamente
+    for (const word1 of words1) {
+      if (words2.includes(word1)) {
+        matchCount += 1;
+      } else {
+        // Buscar coincidencias parciales (una palabra contiene a la otra)
+        for (const word2 of words2) {
+          if (word1.includes(word2) || word2.includes(word1)) {
+            matchCount += 0.7; // Puntuación menor para coincidencias parciales
+            break;
+          }
+        }
+      }
+    }
+    
+    return matchCount / totalWords;
+  }
+
+  // ✅ Búsqueda por palabras clave específicas
+  private findByKeywords(productName: string): string[] {
+    const keywordMatches: { [key: string]: string[] } = {
+      'bisagra': ['azul', 'cobre', 'dorado', 'negro', 'multicolor'],
+      'corazon': ['dorado', 'negro', 'plateado', 'rosa'],
+      'triangulo': ['dorado', 'negro', 'plateado', 'rosa'],
+      'flecha': ['dorado', 'negro', 'plateado'],
+      'alas': ['plateado'],
+      'gema': ['azul', 'morado', 'transparente', 'rojo', 'verde'],
+      'acrilico': ['azul', 'blanco', 'rojo', 'negro', 'amarillo'],
+      'acrílico': ['azul', 'blanco', 'rojo', 'negro', 'amarillo'],
+      'silicona': ['azul', 'blanco', 'rojo', 'rosa', 'negro', 'verde'],
+      'metal': ['azul', 'cobre', 'dorado'],
+      'orfebre': ['dorado', 'plateado'],
+      'mandala': ['dorado', 'plateado'],
+      'nostril': ['azul', 'multicolor', 'negro'],
+      'ombligo': ['dorado', 'plateado', 'multicolor'],
+      'piedra': ['cristal', 'negro'],
+      'duo': ['celeste', 'dorado', 'verde'],
+      'medusa': ['negro', 'verde'],
+      'rosa': ['azul', 'celeste', 'rojo', 'rosa', 'verde'],
+      'flor': ['azul', 'celeste', 'rojo', 'rosa', 'verde']
+    };
+    
+    for (const [keyword, colors] of Object.entries(keywordMatches)) {
+      if (productName.includes(keyword)) {
+        console.log(`🎯 Keyword match: "${keyword}" -> [${colors.join(', ')}]`);
+        return colors;
+      }
+    }
+    
+    return [];  
+  }
+
+  // ✅ Búsqueda por tipo de producto
+  private findByProductType(productName: string): string[] {
+    const typeMatches: { [key: string]: string[] } = {
+      'anillo': ['azul', 'cobre', 'dorado', 'negro', 'multicolor'],
+      'aro': ['azul', 'multicolor', 'negro'],
+      'banana': ['azul', 'dorado', 'plateado', 'verde', 'rojo'],
+      'barbell': ['azul', 'cobre', 'dorado', 'negro', 'plateado'],
+      'labret': ['cobre', 'dorado', 'negro', 'plateado', 'rosa'],
+      'plug': ['amarillo', 'azul', 'negro', 'blanco', 'verde'],
+      'tunel': ['azul', 'blanco', 'dorado', 'plateado', 'rojo', 'verde'],
+      'túnel': ['azul', 'blanco', 'dorado', 'plateado', 'rojo', 'verde'],
+      'expander': ['celeste', 'dorado', 'negro', 'verde'],
+      'dilatador': ['blanco', 'negro', 'rosa', 'rojo', 'plateado', 'violeta'],
+      'piercing': ['azul', 'cobre', 'dorado', 'negro', 'multicolor']
+    };
+    
+    for (const [type, colors] of Object.entries(typeMatches)) {
+      if (productName.includes(type)) {
+        console.log(`🎯 Type match: "${type}" -> [${colors.join(', ')}]`);
+        return colors;
+      }
+    }
+    
+    return [];
+  }
+
   // Método para seleccionar un producto para el popup
   selectProductForPopup(product: Product): void {
-    // console.log('Seleccionando producto para popup:', product.nombre);
     this.selectedProductSubject.next(product);
   }
 
@@ -164,35 +414,8 @@ export class ProductService {
     return this.http.delete<any>(url)
   }
 
-  // Método para obtener los colores disponibles de un producto
-  getProductColors(productId: number): Observable<any[]> {
-    const url = `${this.apiUrl}/${productId}/color`;
-    
-    return this.http.get<any[]>(url).pipe(
-      map(response => {
-        // Transformamos la respuesta para obtener solamente los nombres de los colores
-        if (response && response.length > 0) {
-          // Verificar si son objetos con propiedad 'color' o 'nombre'
-          if (typeof response[0] === 'object') {
-            return response.map(item => {
-              // Puede venir como 'color' (de lineapedido) o 'nombre' (de product_colors)
-              return item.color || item.nombre || 'Estándar';
-            });
-          }
-        }
-        return response || ['Estándar'];
-      }),
-      catchError(error => {
-        console.warn(`No se pudieron cargar colores para el producto ${productId}:`, error);
-        // Devolver array con un color estándar en caso de error
-        return of(['Estándar']);
-      })
-    );
-  }
-
   // Método para buscar productos
   searchProducts (term: string): Observable<Product[]> {
-    // Corregido: Ruta adecuada para búsqueda
     const url = `${this.apiUrl}/search?q=${term}`
     return this.http.get<Product[]>(url).pipe(
       catchError(error => {
@@ -203,23 +426,16 @@ export class ProductService {
   }
 
   // Método para obtener la ruta de la imagen del producto
-  getProductImageSrc(product: Product): string {
-    return ProductImageHelper.getProductImageSrc(product);
+  getProductImageSrc(product: Product, selectedColor?: string): string {
+    return ProductImageHelper.getProductImageSrc(product, selectedColor);
   }
 
   // Método para obtener productos destacados (para la página principal)
   getFeaturedProducts(): Observable<Product[]> {
-    // Puedes implementar un endpoint específico para productos destacados
-    // o simplemente limitar a algunos productos aleatorios o los más recientes
     console.log('Solicitando productos destacados desde:', this.apiUrl);
     
-    // Opción 1: Endpoint específico si existe
-    // return this.http.get<Product[]>(`${this.apiUrl}/destacados`);
-    
-    // Opción 2: Usar los productos existentes y limitar a unos pocos
     return this.getProducts().pipe(
       map(products => {
-        // Tomar los primeros 8 productos como destacados
         return products.slice(0, 8);
       })
     );
@@ -231,8 +447,7 @@ export class ProductService {
     const originalSrc = img.src
     console.error(`Error al cargar imagen: ${originalSrc}`)
 
-    // Usar directamente la imagen por defecto en la raíz
     img.src = this.defaultImage
-    img.onerror = null // Prevenir bucles infinitos
+    img.onerror = null
   }
 }

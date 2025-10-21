@@ -322,13 +322,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
   /**
    * Realiza una búsqueda
    */
-  search (): void {
+  search(): void {
     if (this.searchTerm.trim()) {
-      console.log('Realizando búsqueda:', this.searchTerm)
+      console.log('🔍 Navbar: Realizando búsqueda:', this.searchTerm);
       this.router.navigate(['/search'], {
-        queryParams: { term: this.searchTerm }
-      })
-      this.searchTerm = ''
+        queryParams: { term: this.searchTerm.trim() }
+      });
+      // ✅ Limpiar el campo de búsqueda después de buscar
+      this.searchTerm = '';
+    } else {
+      console.log('⚠️ Navbar: Término de búsqueda vacío');
     }
   }
 }
