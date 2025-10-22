@@ -265,4 +265,22 @@ export class OrderService {
       hasToken: !!this.authService.getToken()
     });
   }
+
+  enviarAlbaranPorEmail(
+    pedido: any,
+    usuario: any,
+    pdfBase64: string
+  ): Observable<any> {
+    this.checkAuthentication();
+    const headers = this.getAuthHeaders();
+    return this.http.post(
+      `${this.apiUrl}/enviar-albaran-email`,
+      { pedido, usuario, pdfBase64 },
+      { headers }
+    ).pipe(
+      catchError(this.handleError('enviar albarán por email'))
+    );
+  }
+  
+  
 }

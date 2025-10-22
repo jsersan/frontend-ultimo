@@ -55,6 +55,7 @@ export interface Order {
   usuario_id: number; // ID del usuario (se mapea a iduser en backend)
   fecha: string; // Fecha en formato ISO string
   total: number;
+  estado: string; // Estado de la petición
   lineas?: OrderLine[]; // Líneas con 'cantidad'
 }
 
@@ -67,6 +68,7 @@ export interface OrderBackend {
   iduser: number; // ✅ Backend espera 'iduser'
   fecha: string; // Fecha en formato YYYY-MM-DD
   total: number;
+  estado?: string;
   lineas?: OrderLineBackend[]; // Líneas con 'cant'
 }
 
@@ -146,30 +148,30 @@ export class OrderUtils {
    */
   static fromBackendFormat(orderBackend: OrderBackend): Order {
     console.log('📦 Transformando OrderBackend a Order:', orderBackend);
-    
+  
     return {
       id: orderBackend.id,
       usuario_id: orderBackend.iduser,
       fecha: orderBackend.fecha,
       total: orderBackend.total,
+      estado: orderBackend.estado || '', // <-- Añade esta línea. Valor por defecto si no existe.
       lineas: orderBackend.lineas?.map(line => {
         const transformedLine = {
           id: line.id,
           idpedido: line.idpedido,
           idprod: line.idprod,
           color: line.color,
-          cantidad: line.cant, // cant -> cantidad
+          cantidad: line.cant,
           nombre: line.nombre,
-          precio: line.precio || 0, // ✅ IMPORTANTE: Mapear precio
-          product: line.product // ✅ IMPORTANTE: Incluir objeto product
+          precio: line.precio || 0,
+          product: line.product
         };
-        
         console.log(`📋 Línea transformada: ${transformedLine.nombre} - Precio: ${transformedLine.precio}`);
-        
         return transformedLine;
       })
     };
   }
+  
 
   /**
    * Convierte CartItem[] a OrderLine[]

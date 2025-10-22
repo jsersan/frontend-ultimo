@@ -360,12 +360,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       
       // ✅ Crear el objeto de pedido simplificado para el backend
       const order: Order = {
-        id: 0, // Se asignará en el backend
+        id: 0, // Se asignará backend
         usuario_id: this.currentUser.id,
-        fecha: new Date().toISOString().split('T')[0], // Solo fecha YYYY-MM-DD
+        fecha: new Date().toISOString().split('T')[0],
         total: this.total,
-        lineas: orderLines
+        lineas: orderLines,
+        estado: 'pendiente'  // <--- NUEVO CAMPO requerido
       };
+      
       
       console.log('📦 Pedido a crear:', order);
       
