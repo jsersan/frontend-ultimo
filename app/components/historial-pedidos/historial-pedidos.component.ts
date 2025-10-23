@@ -1,17 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { OrderService } from '../../services/order.service';
-import { PdfService } from '../../services/pdf.service';
-import { AuthService } from '../../services/auth.service';
-
-// Usa el tipo que realmente exportas en tu proyecto
-import { Order } from '../../models/order';
-
-// Si tienes un modelo para User, impórtalo
-import { User } from '../../models/user';
-
-// Ajusta según tus datos reales de línea
-interface LineaPedido { }
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Subscription } from 'rxjs'
+import { OrderService } from '../../services/order.service'
+import { PdfService } from '../../services/pdf.service'
+import { AuthService } from '../../services/auth.service'
+import { Order, OrderLine } from '../../models/order'
+import { User } from '../../models/user'
 
 @Component({
   selector: 'app-historial-pedidos',
@@ -19,65 +12,64 @@ interface LineaPedido { }
   styleUrls: ['./historial-pedidos.component.scss']
 })
 export class HistorialPedidosComponent implements OnInit, OnDestroy {
-  pedidos: Order[] = [];
-  currentUser: User | null = null;
-  private subscription?: Subscription;
+  pedidos: (Order & { expanded?: boolean })[] = []
+  currentUser: User | null = null
+  private subscription?: Subscription
 
-  constructor(
+  constructor (
     private orderService: OrderService,
     private pdfService: PdfService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    this.currentUser = this.authService.currentUserValue || null;
-    this.loadPedidos();
+  ngOnInit (): void {
+    this.currentUser = this.authService.currentUserValue || null
+    this.loadPedidos()
   }
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  ngOnDestroy (): void {
+    if (this.subscription) this.subscription.unsubscribe()
   }
 
-  loadPedidos(): void {
-    try {
-      this.subscription = this.orderService.getUserOrders().subscribe({
-        next: (orders: Order[]) => {
-          this.pedidos = orders;
-        },
-        error: (err) => console.error(err)
-      });
-    } catch (e) {
-      console.error(e);
+  loadPedidos (): void {
+    this.subscription = this.orderService.getUserOrders().subscribe({
+      next: (orders: Order[]) => {
+        // Ordena del más reciente al más antiguo
+        this.pedidos = orders
+          .sort((a, b) => {
+            const dateB = new Date(b.fecha).getTime()
+            const dateA = new Date(a.fecha).getTime()
+            if (dateB !== dateA) {
+              return dateB - dateA
+            }
+            return (b.id ?? 0) - (a.id ?? 0)
+          })
+          .map(p => ({ ...p, expanded: false }))
+      },
+      error: err => console.error(err)
+      
+    })
+  }
+
+  descargarAlbaran (pedidoId: number): void {
+    const pedido = this.pedidos.find(p => p.id === pedidoId);
+    console.log('Lineas del pedido:', pedido?.lineas); // <--- aquí
+    if (!pedido || !this.currentUser) return
+
+    if (!pedido.lineas || pedido.lineas.length === 0) {
+      // SOLO ejecuta si tienes implementado getOrderLines en el servicio
+      if (typeof this.orderService.getOrderLines === 'function') {
+        this.orderService
+          .getOrderLines(pedido.id ?? 0)
+          .subscribe((lineas: OrderLine[]) => {
+            this.pdfService.generarAlbaran(pedido, lineas, this.currentUser)
+          })
+      } else {
+        alert('No está implementado el método getOrderLines en OrderService')
+      }
+      return
+    } else {
+      this.pdfService.generarAlbaran(pedido, pedido.lineas, this.currentUser)
     }
   }
-
-  descargarAlbaran(pedidoId: number): void {
-    const pedido = this.pedidos.find((p) => p.id === pedidoId);
-    if (!pedido || !this.currentUser) return;
-
-    const lineas: LineaPedido[] = this.getLineasPedido(pedidoId);
-    // Asegúrate que tu pdfService.generarAlbaran devuelve Promise<Blob>
-    this.pdfService.generarAlbaran(pedido, lineas, this.currentUser).then(
-      (pdfBlob: Blob) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(pdfBlob);
-        reader.onloadend = () => {
-          if (!reader.result) return;
-          const base64data = reader.result.toString().split(',')[1];
-          this.orderService.enviarAlbaranPorEmail(pedido, this.currentUser!, base64data)
-            .subscribe({
-              next: () => console.log('Email con albarán enviado'),
-              error: (err) => console.error('Error enviando email', err),
-            });
-        };
-      }
-    );
-  }
-
-  getLineasPedido(pedidoId: number): LineaPedido[] {
-    // Implementa la lógica real aquí según tu modelo/datos
-    return [];
-  }
 }
-
-

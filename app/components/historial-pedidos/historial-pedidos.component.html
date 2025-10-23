@@ -1,27 +1,62 @@
 <div class="historial-container">
-  <h2>Historial de Pedidos</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID Pedido</th>
-        <th>Fecha</th>
-        <th>Estado</th>
-        <th>Total</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let pedido of pedidos">
-        <td>{{ pedido.id }}</td>
-        <td>{{ pedido.fecha | date }}</td>
-        <td>{{ pedido.estado }}</td>
-        <td>{{ pedido.total | currency }}</td>
-        <td>
-          <button (click)="descargarAlbaran(pedido.id!)">Descargar Albarán</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <h2 class="historial-title">Historial de Pedidos</h2>
+
+  <div *ngIf="pedidos.length === 0" class="no-pedidos">
+    <div class="no-pedidos-icon">📦</div>
+    <h3>No tienes pedidos aún</h3>
+    <p>Prueba a realizar tu primera compra. ¡Tus pedidos aparecerán aquí!</p>
+  </div>
+
+  <div class="pedidos-list" *ngIf="pedidos.length > 0">
+    <div class="pedido-item" *ngFor="let pedido of pedidos; let idx = index">
+      <div class="pedido-header" (click)="pedido.expanded = !pedido.expanded">
+        <div class="pedido-info">
+          <span class="pedido-ref">Pedido #{{pedido.id}}</span>
+          <span class="pedido-fecha">{{pedido.fecha | date:'mediumDate'}}</span>
+        </div>
+        <span class="pedido-total">${{pedido.total}}</span>
+        <div class="expand-icon" [ngClass]="{'expanded': pedido.expanded}">
+          <span>&#9660;</span>
+        </div>
+      </div>
+
+      <div class="pedido-content" [ngClass]="{'expanded': pedido.expanded}">
+        <div class="pedido-details" *ngIf="pedido.expanded">
+          <div class="pedido-actions">
+            <button *ngIf="pedido.id" class="action-btn pdf-btn" (click)="descargarAlbaran(pedido.id)">
+              <span class="pdf-icon">📄</span>
+              <span class="pdf-text">Descargar Albarán</span>
+            </button>
+            
+          </div>
+          <table class="pedido-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Color</th>
+                <th>Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let linea of pedido.lineas">
+                <td data-label="Producto">{{linea.nombre}}</td>
+                <td data-label="Cantidad">{{linea.cantidad}}</td>
+                <td data-label="Color">{{linea.color}}</td>
+                <td data-label="Precio">{{ linea.precio | number: '1.2-2' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="precio-total-row">
+                <td colspan="3"></td>
+                <td><strong>Total:</strong> {{ pedido.total | number: '1.2-2' }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
