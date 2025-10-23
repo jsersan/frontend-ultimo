@@ -300,6 +300,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   
     try {
       // MODIFICA AQUÍ: usa 'cant' y 'precio', que espera el backend
+      console.log(this.cartItems) 
       const orderLines: OrderLine[] = this.cartItems.map(item => {
         return {
           idpedido: 0,
@@ -307,10 +308,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           color: item.color || 'Estándar',
           cantidad: item.cantidad,
           precio: !isNaN(Number(item.precio)) && Number(item.precio) > 0
-            ? Number(item.precio)
-            : item.producto && typeof item.producto === 'object' && item.producto.precio
-              ? Number(item.producto.precio)
-              : 0,
+          ? Number(item.precio)
+          : item.producto && typeof item.producto === 'object' && item.producto.precio
+            ? Number(item.producto.precio)
+            : 0,        
           nombre: item.nombre,
           cant: item.cantidad
         }
@@ -339,6 +340,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       }
   
       console.log('✅ Pedido preparado con usuario_id:', order.usuario_id);
+      console.log("Pedido completo:", order);
   
       this.orderService.createOrder(order).subscribe({
         next: response => {

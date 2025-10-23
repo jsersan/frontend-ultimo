@@ -9,7 +9,7 @@ import {
 import { Observable, throwError } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
-import { Order, OrderBackend, OrderDetail, OrderUtils } from '../models/order'
+import { Order, OrderBackend, OrderDetail, OrderUtils } from '../models/order';
 import { AuthService } from './auth.service'
 import { OrderLine } from '../models/order' // Ajusta la ruta si tu modelo está en otra carpeta
 
@@ -92,6 +92,7 @@ export class OrderService {
           console.log(`✅ Se encontraron ${ordersBackend.length} pedidos`)
 
           // Transformar cada pedido del formato backend al frontend
+          
           return ordersBackend.map(orderBackend =>
             OrderUtils.fromBackendFormat(orderBackend)
           )
